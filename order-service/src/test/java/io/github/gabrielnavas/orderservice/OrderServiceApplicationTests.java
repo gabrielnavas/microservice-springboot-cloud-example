@@ -65,9 +65,8 @@ class OrderServiceApplicationTests {
 
     private OrderRequest createProductRequest() {
         List<OrderRequestItemsDtos> list = new ArrayList<>();
-        list.add(OrderRequestItemsDtos.builder().skuCode("!@100").price(BigDecimal.valueOf(100.10)).quantity(10).build());
-        list.add(OrderRequestItemsDtos.builder().skuCode("!@200").price(BigDecimal.valueOf(200.20)).quantity(20).build());
-        list.add(OrderRequestItemsDtos.builder().skuCode("!@300").price(BigDecimal.valueOf(300.30)).quantity(30).build());
+        list.add(OrderRequestItemsDtos.builder().skuCode("!@123").price(BigDecimal.valueOf(100.10)).quantity(10).build());
+        list.add(OrderRequestItemsDtos.builder().skuCode("!@213").price(BigDecimal.valueOf(200.20)).quantity(5).build());
         return OrderRequest.builder()
                 .orderRequestItemsDtosList(list)
                 .build();

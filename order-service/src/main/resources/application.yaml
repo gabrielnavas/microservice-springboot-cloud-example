@@ -10,5 +10,10 @@ spring:
     init:
       mode: always
 
+endpoints:
+  http-rest:
+    inventory: http://localhost:8082/api/inventory
+
+
 server:
   port: 8081

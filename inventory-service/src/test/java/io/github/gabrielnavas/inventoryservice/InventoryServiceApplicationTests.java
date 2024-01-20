@@ -1,6 +1,7 @@
 package io.github.gabrielnavas.inventoryservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.gabrielnavas.inventoryservice.dtos.InventoryResponse;
 import io.github.gabrielnavas.inventoryservice.models.Inventory;
 import io.github.gabrielnavas.inventoryservice.repositories.InventoryRepository;
 import net.bytebuddy.utility.dispatcher.JavaDispatcher;
@@ -21,6 +22,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,17 +52,25 @@ class InventoryServiceApplicationTests {
 
 	@Test
 	void shouldVerifyIsInStock() throws Exception {
-		Inventory inventory = Inventory.builder().skuCode("!@123").quantity(10).build();
-		inventoryRepository.save(inventory);
+		Inventory inventory1 = Inventory.builder().skuCode("!@123").quantity(10).build();
+		Inventory inventory2 = Inventory.builder().skuCode("!@321").quantity(0).build();
+		inventoryRepository.save(inventory1);
+		inventoryRepository.save(inventory2);
 
-		var result = mockMvc.perform(MockMvcRequestBuilders.get("/api/inventory/" + inventory.getSkuCode()))
-				.andExpect(status().isOk())
+		var result = mockMvc.perform(MockMvcRequestBuilders.get("/api/inventory")
+						.param("sku-code", inventory1.getSkuCode(), inventory2.getSkuCode())
+				).andExpect(status().isOk())
 				.andReturn();
 
 		String body = result.getResponse().getContentAsString();
-		Boolean isInStock = objectMapper.readValue(body, Boolean.class);
+		InventoryResponse[] inventoryResponses = objectMapper.readValue(body, InventoryResponse[].class);
 
-		Assertions.assertEquals(true, isInStock);
+		Assertions.assertTrue(inventoryResponses.length >= 2);
+		Assertions.assertEquals(inventory1.getSkuCode(), inventoryResponses[0].getSkuCode());
+		Assertions.assertTrue(inventoryResponses[0].getIsInStock());
+
+		Assertions.assertEquals(inventory2.getSkuCode(), inventoryResponses[1].getSkuCode());
+		Assertions.assertFalse(inventoryResponses[1].getIsInStock());
 	}
 
 }

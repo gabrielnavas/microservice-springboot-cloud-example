@@ -20,7 +20,7 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     @Value("${endpoints.http-rest.inventory}")
     private String inventoryHttpRestEndpoint;
@@ -33,7 +33,7 @@ public class OrderService {
 
         // call Inventory Service checking quantity of each item
         List<String> skuCodes = order.getOrderLineItemsList().stream().map(OrderLineItems::getSkuCode).toList();
-        InventoryResponse[] inventoryResponses = webClient.get()
+        InventoryResponse[] inventoryResponses = webClientBuilder.build().get()
                 .uri(inventoryHttpRestEndpoint, uriBuilder -> uriBuilder.queryParam("sku-code", skuCodes).build())
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
